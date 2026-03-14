@@ -1,4 +1,4 @@
-# Assignment #7: Music Library API
+#  Music Library API
 
 A RESTful API for managing a music library built with Node.js, Express.js, and Sequelize ORM using SQLite database.
 
