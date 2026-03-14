@@ -114,6 +114,32 @@ app.put('/api/tracks/:id', async (req, res) => {
     }
 });
 
+
+// DELETE /api/tracks/:id - Delete track
+app.delete('/api/tracks/:id', async (req, res) => {
+    try {
+        const id = req.params.id; 
+
+        if (isNaN(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'Invalid course ID. ID must be a positive number.'
+        });}
+
+        const deletedRowsCount = await Track.destroy({
+        where: {  trackId: id}
+        });
+        
+        if (deletedRowsCount === 0) {
+            return res.status(404).json({ error: 'Track not found' });
+        }
+        
+        res.json({ message: 'Track deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting track:', error);
+        res.status(500).json({ error: 'Failed to delete track' });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on port http://localhost:${PORT}`);
