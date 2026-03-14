@@ -1,4 +1,4 @@
-// Import database and model
+const { db, Track } = require('./setup');
 
 // Seed data
 const sampleTracks = [
