@@ -36,6 +36,13 @@ app.get('/api/tracks', async (req, res) => {
 // GET /api/tracks/:id - Get track by ID
 app.get('/api/tracks/:id', async (req, res) => {
     try {
+        const id = req.params.id; 
+
+        if (isNaN(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'Invalid course ID. ID must be a positive number.'
+        });
+    }
         const track = await Track.findByPk(req.params.id);
         
         if (!track) {
@@ -49,6 +56,63 @@ app.get('/api/tracks/:id', async (req, res) => {
     }
 });
 
+
+// POST /api/tracks - Create new track
+app.post('/api/tracks', async (req, res) => {
+    try {
+        const { songTitle, artistName, albumName, genre, duration, releaseYear } = req.body;
+
+        if (!songTitle || !artistName || !albumName || !genre) {
+            return res.status(400).json({
+                error: 'songTitle, artistName, albumName, and genre are required.'
+            });
+        };
+        
+        const newTrack = await Track.create({
+             songTitle,
+             artistName,
+             albumName,
+             genre,
+             duration,
+            releaseYear
+        });
+        
+        res.status(201).json(newTrack);
+    } catch (error) {
+        console.error('Error creating track:', error);
+        res.status(500).json({ error: 'Failed to create track' });
+    }
+});
+
+
+// PUT /api/tracks/:id - Update existing track
+app.put('/api/tracks/:id', async (req, res) => {
+    try {
+        const id = req.params.id; 
+
+        if (isNaN(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'Invalid course ID. ID must be a positive number.'
+        });}
+
+       const { songTitle, artistName, albumName, genre, duration, releaseYear } = req.body;
+        
+        const [updatedRowsCount] = await Track.update(
+            { songTitle, artistName, albumName, genre, duration, releaseYear },
+            { where: {  trackId: id} }
+        );
+        
+        if (updatedRowsCount === 0) {
+            return res.status(404).json({ error: 'Track not found' });
+        }
+        
+        const updatedTrack = await Track.findByPk(id);
+        res.json(updatedTrack);
+    } catch (error) {
+        console.error('Error updating track:', error);
+        res.status(500).json({ error: 'Failed to update track' });
+    }
+});
 
 // Start server
 app.listen(PORT, () => {
